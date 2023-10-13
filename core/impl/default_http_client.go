@@ -39,30 +39,31 @@ import (
 type DefaultHttpClient struct {
 	httpHandler  *httphandler.HttpHandler
 	httpConfig   *config.HttpConfig
-	transport    *http.Transport
+	transport    http.RoundTripper
 	goHttpClient *http.Client
 }
 
 func NewDefaultHttpClient(httpConfig *config.HttpConfig) *DefaultHttpClient {
-	var transport *http.Transport
+	var transport http.RoundTripper
 	if httpConfig.HttpTransport != nil {
 		transport = httpConfig.HttpTransport
 	} else {
-		transport = &http.Transport{
+		defaultTransport := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: httpConfig.IgnoreSSLVerification},
 		}
 
 		if httpConfig.DialContext != nil {
-			transport.DialContext = httpConfig.DialContext
+			defaultTransport.DialContext = httpConfig.DialContext
 		}
 
 		if httpConfig.HttpProxy != nil {
 			proxyUrl := httpConfig.HttpProxy.GetProxyUrl()
 			proxy, err := url.Parse(proxyUrl)
 			if err == nil {
-				transport.Proxy = http.ProxyURL(proxy)
+				defaultTransport.Proxy = http.ProxyURL(proxy)
 			}
 		}
+		transport = defaultTransport
 	}
 
 	client := &DefaultHttpClient{

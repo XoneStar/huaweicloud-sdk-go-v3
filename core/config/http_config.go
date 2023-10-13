@@ -51,7 +51,7 @@ type HttpConfig struct {
 	// HttpTransport This configuration has the highest priority,
 	// which means specifying the HttpTransport will invalidate other configurations,
 	// such as DialContext, HttpProxy, IgnoreSSLVerification.
-	HttpTransport *http.Transport
+	HttpTransport http.RoundTripper
 	// IgnoreContentTypeForGetRequest Ignore the request header Content-Type when sending a GET request,
 	// the default value is false
 	IgnoreContentTypeForGetRequest bool
@@ -108,7 +108,7 @@ func (config *HttpConfig) WithHttpHandler(handler *httphandler.HttpHandler) *Htt
 // WithHttpTransport This configuration has the highest priority,
 // which means specifying the HttpTransport will invalidate other configurations,
 // such as DialContext, HttpProxy, IgnoreSSLVerification.
-func (config *HttpConfig) WithHttpTransport(transport *http.Transport) *HttpConfig {
+func (config *HttpConfig) WithHttpTransport(transport http.RoundTripper) *HttpConfig {
 	config.HttpTransport = transport
 	return config
 }

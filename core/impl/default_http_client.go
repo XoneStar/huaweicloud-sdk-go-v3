@@ -29,8 +29,11 @@ import (
 	"github.com/huaweicloud/huaweicloud-sdk-go-v3/core/request"
 	"github.com/huaweicloud/huaweicloud-sdk-go-v3/core/response"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -115,6 +118,13 @@ func (client *DefaultHttpClient) SyncInvokeHttpWithExchange(request *request.Def
 	resp, err := client.goHttpClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if os.Getenv("HCS_DEBUG") == "true" {
+		dumpRequest, _ := httputil.DumpRequest(req, false)
+		log.Println("request:", string(dumpRequest))
+		dumpResp, _ := httputil.DumpResponse(resp, true)
+		log.Println("response:", string(dumpResp))
 	}
 
 	processProgressResponse(request, resp)
